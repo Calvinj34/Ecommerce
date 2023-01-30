@@ -51,36 +51,32 @@ def loginPage():
     return render_template('login.html', form=form)
 
 
-@app.route('/products', methods=["GET"])
-def getProducts():
-    cart = products.query.all()
+# @app.route('/products', methods=["GET"])
+# def getProducts():
+#     cart = Product.query.all()
+#     html_form = AddtocartForm()
 
-    if request.method == "POST":
-        # if loginForm.validate():
-            url = "https://kohls.p.rapidapi.com/products/list"
+#     if request.method == "POST":
+#         # if loginForm.validate():
+#             url = "https://fakestoreapi.com/products"
 
-            querystring = {"limit":"24","offset":"1","dimensionValueID":"AgeAppropriate:Teens"}
 
-            headers = {
-                "X-RapidAPI-Key": "SIGN-UP-FOR-KEY",
-                "X-RapidAPI-Host": "kohls.p.rapidapi.com"
-            }
+          
+#             response = requests.request("GET", url)
 
-            response = requests.request("GET", url, headers=headers, params=querystring)
-
-            print(response.text)
-            return render_template('products.html') 
-            # , html_form = loginForm,
+#             print(response.text)
+#             return render_template('products.html') 
+            
    
-    if current_user.is_authenticated:
-        my_products = products.query.filter_by(user_id=current_user.id).all()
-        products = {products.product_id for products in my_products}
+#     if current_user.is_authenticated:
+#         my_products = products.query.filter_by(user_id=current_user.id).all()
+#         products = {products.product_id for products in my_products}
 
-        for products in cart:
-            if products.id in cart:
-                products = True
+#         for products in cart:
+#             if products.id in cart:
+#                 products = True
     
-    return render_template('products.html', cart=cart)
+#     return render_template('products.html', cart=cart, html_form = html_form)
 
 @app.route('/products/delete', methods=["GET"])
 @login_required
@@ -100,12 +96,88 @@ def productsPage():
     
     if request.method == "POST":
         if my_form.validate():
-            rl = f'https://newsapi.org/v2/everything?q={search_term}&apiKey={NEWS_API_KEY}&pageSize=20'
+            url = 'https://fakestoreapi.com/products'
             result = requests.get(url)
-
             data = result.json()
-            
-            articles = data['articles']
-            return render_template('products.html', html_form = my_form, articles = articles)
+            print (result.ok)
+            if result.ok:
+                data = result.json()
+                items = data[0]['title']
+                prices = data[0]['price']
+                categories = data[0]['category']
+                images = data[0]['image']
+                
+                purchase = Product(items, prices, categories, images)
+                shop = {
+                    'item': items,
+                    'price': prices,
+                    'category':categories,
+                    'image': images,
+                    }
+                
+            return render_template('products.html', html_form = my_form, shop = shop, purchase = purchase)
 
     return render_template('products.html', html_form = my_form)
+
+
+
+
+
+
+# @app.route('/pokemon', methods=["GET","POST"])    
+# def pokemon():
+#     pokemon = Pokemon.query.all()
+#     if current_user.is_authenticated:
+#         my_pokemon = Catch.query.filter_by(user_id=current_user.id).all()
+#         # pokemon = {pokemon.pokemon_id for pokemon in my_pokemon}
+#         for p in my_pokemon:
+#             print(p)
+#             if p.id in pokemon:
+#                 p.caught = True
+#     form = pokemonform()
+#     if request.method == 'POST':
+#         pokeName = form.pokemon.data
+#         pokemon = Pokemon.query.filter_by(name=pokeName).first()
+#         print(pokemon)
+        
+#         if pokemon:
+#             return render_template('pokemon.html', form = form, pokemon = pokemon)
+#         url = 'https://pokeapi.co/api/v2/pokemon/'
+#         response = requests.get(url + pokeName)
+#         print (response)
+#         print (response.ok)
+#         if response.ok:
+#             data = response.json()
+#             names = data['forms'][0]['name']
+#             abilities = data['abilities'][0]['ability']['name']
+#             sprites = data['sprites']['front_shiny']
+#             hp_stats = data['stats'][0]['base_stat']
+#             attack_stats = data['stats'][1]['base_stat']
+#             defense_stats = data['stats'][2]['base_stat']
+#             moves = data['moves'][0]['move']['name']
+#             pokemon=Pokemon(names, abilities, sprites, hp_stats, attack_stats, defense_stats, moves)
+#             pokemon.saveToDB()
+#             # pokemon = {
+#             #     'name': names,
+#             #     'ability': abilities,
+#             #     'experience': experience,
+#             #     'sprite': sprites,
+#             #     'hp_stat': hp_stats,
+#             #     'attack_stat': attack_stats,
+#             #     'defense_stat': defense_stats,
+#             #     'move': moves
+#             # }
+#             return render_template('pokemon.html', form = form, pokemon = pokemon)
+#         # return(f'Pokemon:\nName: {names}, ability: {drivers}, base-experience: {experience}, sprite: {sprites}, and stats: {hp_stats}, {attack_stats}, {defense_stats}.')
+#     return render_template('pokemon.html', form = form)
+# # @app.route('/my_pokemon', methods=["GET"])
+# # def caught():
+    
+# #      if len(my_pokemon) == 5:
+# #             print('Stop')
+# #     else:
+# #         print(my_pokemon)
+# # return render_template('my_pokemon.html')
+
+
+#     # source <venv>/bin/activate

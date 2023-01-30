@@ -30,7 +30,7 @@ class Product(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
 
-    def __init__(self, product_id, product_name,  img_url, caption, user_id):
+    def __init__(self, product_id, product_name, img_url, caption, user_id):
         self.product_id = product_id
         self.product_name =product_name
         self.img_url = img_url
@@ -57,3 +57,24 @@ class Product(db.Model):
         'user_id': self.user_id,
         'author': self.author.username,
          }
+
+
+
+class Cart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(45), db.ForeignKey('user.username'))
+    product_id = db.Column(db.String, db.ForeignKey('product.product_id'))
+
+
+    def __init__(self, username, product_id):
+        self.username = username
+        self.product_id = product_id
+        
+
+    def saveToDB(self):
+        db.session.add(self)
+        db.session.commit()
+        
+    def deleteFromDB(self):
+        db.session.delete(self)
+        db.session.commit()
